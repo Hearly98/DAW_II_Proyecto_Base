@@ -1,9 +1,6 @@
 package com.springboot.app.serviceImplement;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,8 +11,13 @@ import com.springboot.app.model.Producto;
 import com.springboot.app.repository.ProductoRepository;
 import com.springboot.app.service.ProductoService;
 
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
 @Service
 public class ProductoServiceImplement implements ProductoService{
+	@Autowired
+	private EntityManager entityManager;
 
 	@Autowired
 	private ProductoRepository dao;
@@ -40,5 +42,29 @@ public class ProductoServiceImplement implements ProductoService{
 		
 	}
 
+	@Override
+	public Optional<Producto> obtenerPorId(Long id){
+		Producto producto = entityManager.find(Producto.class, id);
+		return Optional.ofNullable(producto);
+	}
 
+	@Transactional
+	@Override
+	public Producto guardarProducto(Producto producto){
+		if(producto.getId() == null){
+			entityManager.persist(producto);
+		}else {
+			producto = entityManager.merge(producto);
+		}
+		return producto;
+	}
+
+	@Transactional
+	@Override
+	public void eliminarProducto(Long id){
+		Producto producto = entityManager.find(Producto.class, id);
+		if(producto != null) {
+			entityManager.remove(producto);
+		}
+	}
 }

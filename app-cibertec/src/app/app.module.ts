@@ -4,6 +4,8 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ProductosComponent } from './components/views/productos/productos.component';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -12,7 +14,9 @@ import { ProductosComponent } from './components/views/productos/productos.compo
   ],
   imports: [
     HttpClientModule,
-    BrowserModule
+    BrowserModule,
+    CommonModule,
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
