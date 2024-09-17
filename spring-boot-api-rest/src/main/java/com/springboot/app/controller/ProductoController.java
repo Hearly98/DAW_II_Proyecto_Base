@@ -11,30 +11,31 @@ import org.springframework.web.bind.annotation.*;
 import com.springboot.app.service.ProductoService;
 
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api/productos")
 public class ProductoController {
 
 	@Autowired
 	private ProductoService service;
 	
-	@GetMapping("/productos")
+	@GetMapping("/")
 	public ResponseEntity<Map<String, Object>> allProducto(){
 		return service.listarProductos();
 	}
-	@GetMapping("/productos/{id}")
-	public ResponseEntity<Producto>obtenerProductoPorId(@PathVariable("id") Long id){
-		return service.obtenerPorId(id)
-				.map(producto -> new ResponseEntity<>(producto, HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	@GetMapping("/{id}")
+	public ResponseEntity<Map<String, Object>> obtenerProductoPorId(@PathVariable("id") Long id){
+		return service.listarProductosPorId(id);
 	}
-	@PostMapping("/productos/save")
-	public ResponseEntity<Producto> guardarProducto(@RequestBody Producto producto){
-		Producto guardarProducto = service.guardarProducto(producto);
-		return new ResponseEntity<>(guardarProducto, HttpStatus.CREATED);
+	@PostMapping("/save")
+	public ResponseEntity<Map<String, Object>> guardarProducto(@RequestBody Producto producto){
+		return service.agregarProductos(producto);
 	}
-	@DeleteMapping("/productos/delete/{id}")
-	public ResponseEntity<Void> eliminarProducto(@PathVariable("id") Long id){
-		service.eliminarProducto(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Map<String, Object>> eliminarProducto(@PathVariable("id") Long id){
+		return service.eliminarProductos(id);
 	}
+	@GetMapping("/enable")
+	public ResponseEntity<Map<String, Object>> listarPorEnable(){
+		return service.listarProductosPorEnabled();
+	}
+
 }

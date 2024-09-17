@@ -12,7 +12,6 @@ import com.springboot.app.repository.ProductoRepository;
 import com.springboot.app.service.ProductoService;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 
 @Service
 public class ProductoServiceImplement implements ProductoService{
@@ -43,28 +42,92 @@ public class ProductoServiceImplement implements ProductoService{
 	}
 
 	@Override
-	public Optional<Producto> obtenerPorId(Long id){
-		Producto producto = entityManager.find(Producto.class, id);
-		return Optional.ofNullable(producto);
-	}
-
-	@Transactional
-	@Override
-	public Producto guardarProducto(Producto producto){
-		if(producto.getId() == null){
-			entityManager.persist(producto);
+	public ResponseEntity<Map<String, Object>> listarProductosPorId(Long id){
+		Map<String, Object> respuesta = new HashMap<>();
+		Optional<Producto> productos = dao.findById(id);
+		if(productos.isPresent()){
+			respuesta.put("productos", productos);
+			respuesta.put("mensaje", "Busqueda correcta");
+			respuesta.put("status", HttpStatus.OK);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.ok().body(respuesta);
 		}else {
-			producto = entityManager.merge(producto);
+			respuesta.put("mensaje", "Sin registros con ID: " + id);
+			respuesta.put("status", HttpStatus.NOT_FOUND);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
 		}
-		return producto;
 	}
 
-	@Transactional
 	@Override
-	public void eliminarProducto(Long id){
-		Producto producto = entityManager.find(Producto.class, id);
-		if(producto != null) {
-			entityManager.remove(producto);
+	public ResponseEntity<Map<String, Object>> listarProductosPorEnabled(){
+		Map<String, Object> respuesta = new HashMap<>();
+		Optional<Producto> productos = dao.findByEnable("S");
+		if(productos.isPresent()){
+			respuesta.put("productos", productos);
+			respuesta.put("mensaje", "Busqueda correcta");
+			respuesta.put("status", HttpStatus.OK);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.ok().body(respuesta);
+		}else {
+			respuesta.put("mensaje", "Sin registros con ENABLED");
+			respuesta.put("status", HttpStatus.NOT_FOUND);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
 		}
 	}
+
+	@Override
+	public ResponseEntity<Map<String, Object>> agregarProductos(Producto producto){
+		Map<String, Object> respuesta = new HashMap<>();
+		dao.save(producto);
+		respuesta.put("productos", producto);
+		respuesta.put("mensaje", "Se añadió correctamente el producto");
+		respuesta.put("status", HttpStatus.CREATED);
+		respuesta.put("fecha", new Date());
+		return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+	}
+
+	@Override
+	public ResponseEntity<Map<String, Object>> editarProductos(Producto prod, Long id){
+		Map<String, Object> respuesta = new HashMap<>();
+		Optional<Producto> productoExiste = dao.findById(id);
+		if(productoExiste.isPresent()){
+			Producto producto = productoExiste.get();
+			producto.setDescripcion(prod.getDescripcion());
+			producto.setCantidad(prod.getCantidad());
+			producto.setPrecio(prod.getPrecio());
+			producto.setEnable(prod.getEnable());
+			dao.save(producto);
+			respuesta.put("productos", producto);
+			respuesta.put("mensaje", "Datos del producto modificado");
+			respuesta.put("status", HttpStatus.CREATED);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+		}else{
+			respuesta.put("mensaje", "Sin registros con ID:" + id);
+			respuesta.put("status", HttpStatus.NOT_FOUND);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+		}
+	}
+
+	@Override
+	public ResponseEntity<Map<String, Object>> eliminarProductos(Long id) {
+		Map<String, Object> respuesta = new HashMap<>();
+		Optional<Producto> productoExiste = dao.findById(id);
+		if (productoExiste.isPresent()) {
+			Producto producto = productoExiste.get();
+			dao.delete(producto);
+			respuesta.put("mensaje", "Producto eliminado correctamente ");
+			respuesta.put("status", HttpStatus.NO_CONTENT);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.NO_CONTENT).body(respuesta);
+		} else {
+			respuesta.put("mensaje", "Sin registros con ID:" + id);
+			respuesta.put("status", HttpStatus.NOT_FOUND);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+		}
+}
 }
