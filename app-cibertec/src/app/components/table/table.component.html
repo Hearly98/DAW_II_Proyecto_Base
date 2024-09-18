@@ -1,0 +1,19 @@
+<div class="col-12  p-5">
+<table class="table">
+    <thead>
+     <tr>
+         <th *ngFor="let title of titles" scope="col">{{title.name}}</th>
+     </tr>
+    </thead>
+    <tbody >
+        <tr *ngFor="let data of datas; index as i">
+            <th scope="row">{{i+1}}</th>
+            <td >{{data.descripcion}}</td>
+            <td >{{data.cantidad}}</td>
+            <td >{{data.enable}}</td>
+            <td >{{data.precio}}</td>
+            <td><button (click)="desactivarProducto(data.id)" class="btn btn-danger">Desactivar</button></td>
+        </tr>
+    </tbody>
+ </table>
+</div>

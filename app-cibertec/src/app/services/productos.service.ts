@@ -2,13 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
-interface Producto {
-  id: number,
-  descripcion: string,
-  precio: number,
-  cantidad: number,
-  enable: string,
-}
+import { Producto } from '../models/producto';
 @Injectable({
   providedIn: 'root'
 })
@@ -23,8 +17,8 @@ export class ProductosService {
     private http: HttpClient
   ) { }
 
-  listarProductos(): Observable<any> {
-    return this.http.get(this.productos)
+  listarProductos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.productos}/`)
   }
   obtenerProductoPorId(id: number): Observable<Producto>{
     return this.http.get<Producto>(`${this.productos}/${id}`);
@@ -38,5 +32,11 @@ export class ProductosService {
   eliminarProducto(id:number): Observable<Producto[]>{
     return this.http.delete<Producto[]>(`${this.productos}/delete/${id}`);
   }
-
+  obtenerProductoPorEnable(): Observable<Producto[]>{
+    return this.http.get<Producto[]>(`${this.productos}/enable`);
+  }
+  desactivarProductoPorId(id: number): Observable<Producto>{
+    const body = {enable:false}
+    return this.http.put<Producto>(`${this.productos}/enable/${id}`, body);
+  }
 }

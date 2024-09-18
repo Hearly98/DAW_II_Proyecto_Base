@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Producto } from 'src/app/models/producto';
 import { ProductosService } from 'src/app/services/productos.service';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-productos',
   templateUrl: './productos.component.html',
@@ -36,9 +37,9 @@ export class ProductosComponent implements OnInit {
 
   obtenerProductos() {
     this._productoService.listarProductos()
-    .subscribe((data) => {
+    .subscribe((data:any) => {
       this.listaProductos = data.productos;
-      console.log(data.productos)
+      console.log(data)
       if(this.listaProductos.length == 0){
         console.log("No hay datos")
       }
@@ -48,6 +49,7 @@ export class ProductosComponent implements OnInit {
   agregarProducto():void{
     if (!this.nuevoDescripcion || !this.nuevoPrecio || !this.nuevoCantidad || !this.nuevoEnable) {
       this.mensajeDeError = "Por favor, complete todos los campos.";
+      Swal.fire('Error', this.mensajeDeError, 'error');
       return;
     }
     const data = {
@@ -57,18 +59,18 @@ export class ProductosComponent implements OnInit {
       cantidad: this.nuevoCantidad,
       enable: this.nuevoEnable,
     };
-    this._productoService.crearProducto(data)
-    .subscribe(
-      response =>{
+    this._productoService.crearProducto(data).subscribe(
+      (response) => {
         this.submitted = true;
+        Swal.fire('Producto Agregado', 'El producto ha sido agregado con éxito', 'success');
         this.obtenerProductos();
         this.limpiarFormulario();
-        this.cerrarModal();
       },
-      error =>{
-        this.mensajeDeError = "Error al registrar un Producto"
+      (error) => {
+        this.mensajeDeError = 'Error al registrar un Producto';
+        Swal.fire('Error', this.mensajeDeError, 'error');
       }
-    )
+    );
   }
   limpiarFormulario() {
     this.nuevoDescripcion = '';
@@ -76,16 +78,27 @@ export class ProductosComponent implements OnInit {
     this.nuevoCantidad = 0;
     this.nuevoEnable = '';
   }
-  eliminarProducto(id:number):void{
-    this._productoService.eliminarProducto(id)
-    .subscribe(
-      response=>{
-        this.obtenerProductos();
-        this.cerrarModal();
-      },
-      error =>{
-        this.mensajeDeError="Error al registrar un Producto."
+  eliminarProducto(id: number): void {
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: 'No podrás revertir esto.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminarlo!',
+      cancelButtonText: 'Cancelar',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this._productoService.eliminarProducto(id).subscribe(
+          (response) => {
+            Swal.fire('Eliminado!', 'El producto ha sido eliminado.', 'success');
+            this.obtenerProductos();
+          },
+          (error) => {
+            this.mensajeDeError = 'Error al eliminar el Producto.';
+            Swal.fire('Error', this.mensajeDeError, 'error');
+          }
+        );
       }
-    )
+    });
   }
 }
