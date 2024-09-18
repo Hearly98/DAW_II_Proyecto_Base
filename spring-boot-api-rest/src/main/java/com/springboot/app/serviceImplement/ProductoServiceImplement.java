@@ -60,10 +60,10 @@ public class ProductoServiceImplement implements ProductoService{
 	}
 
 	@Override
-	public ResponseEntity<Map<String, Object>> listarProductosPorEnabled(){
+	public ResponseEntity<Map<String, Object>> listarProductosPorEnable(){
 		Map<String, Object> respuesta = new HashMap<>();
-		Optional<Producto> productos = dao.findByEnable("S");
-		if(productos.isPresent()){
+		List<Producto> productos = dao.findByEnable("S");
+		if(!productos.isEmpty()){
 			respuesta.put("productos", productos);
 			respuesta.put("mensaje", "Busqueda correcta");
 			respuesta.put("status", HttpStatus.OK);
@@ -130,4 +130,25 @@ public class ProductoServiceImplement implements ProductoService{
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
 		}
 }
+	@Override
+	public ResponseEntity<Map<String, Object>> deshabilitarProductos(Long id) {
+		Map<String,Object> respuesta = new HashMap<>();
+		Optional<Producto> productoExiste = dao.findById(id);
+
+		if (productoExiste.isPresent()) {
+			Producto producto = productoExiste.get();
+			producto.setEnable("N");
+			dao.save(producto);
+			respuesta.put("mensaje", "Producto deshabilitado correctamente");
+			respuesta.put("status", HttpStatus.OK);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.OK).body(respuesta);
+		} else {
+			respuesta.put("mensaje", "Producto no encontrado con ID: " + id);
+			respuesta.put("status", HttpStatus.NOT_FOUND);
+			respuesta.put("fecha", new Date());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(respuesta);
+		}
+	}
+
 }

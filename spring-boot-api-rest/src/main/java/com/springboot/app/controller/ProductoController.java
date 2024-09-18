@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.springboot.app.service.ProductoService;
 
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/api/productos/")
 public class ProductoController {
 
 	@Autowired
@@ -35,7 +35,11 @@ public class ProductoController {
 	}
 	@GetMapping("/enable")
 	public ResponseEntity<Map<String, Object>> listarPorEnable(){
-		return service.listarProductosPorEnabled();
+		return service.listarProductosPorEnable();
+	}
+	@PutMapping("/enable/{id}")
+	public ResponseEntity<Map<String, Object>> deshabilitarProducto(@PathVariable Long id) {
+		return service.deshabilitarProductos(id);
 	}
 
 }

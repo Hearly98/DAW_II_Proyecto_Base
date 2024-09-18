@@ -7,13 +7,14 @@ import org.springframework.stereotype.Repository;
 import com.springboot.app.model.Producto;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long>{
     @Query(
-            value = "SELECT * FROM PRODUCTO pd WHERE pd.enable = :enabled",
+            value = "SELECT * FROM PRODUCTOS pd WHERE pd.enable = :enabled",
             nativeQuery = true)
-    Optional<Producto> findByEnable(String enabled);
+    List<Producto> findByEnable(String enabled);
 }

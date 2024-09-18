@@ -11,9 +11,11 @@ public interface ProductoService {
 	public ResponseEntity<Map<String, Object>> agregarProductos(Producto producto);
 	public ResponseEntity<Map<String, Object>> listarProductosPorId(Long id);
 	public ResponseEntity<Map<String, Object>> editarProductos(Producto prod, Long id);
-	public ResponseEntity<Map<String, Object>> listarProductosPorEnabled();
+	public ResponseEntity<Map<String, Object>> listarProductosPorEnable();
 
 	public ResponseEntity<Map<String, Object>> eliminarProductos(Long id);
+	public ResponseEntity<Map<String, Object>> deshabilitarProductos(Long id);
+
 
 
 }
